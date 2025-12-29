@@ -1,0 +1,189 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Staged customer data from order management system (OMS).  
+    columns:
+      - name: customer_id
+        description: The primary key.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: customer_key
+        description: Surrogate key for customer.      
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Full name of the customer.      
+        tests:
+          - not_null
+          - string_not_empty
+
+  - name: stg_employees
+    description: Staged employees data from order management system (OMS).  
+    columns:
+      - name: employee_id
+        description: The primary key.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: employee_key
+        description: Surrogate key for employee.      
+        tests:
+          - unique
+          - not_null
+      - name: employee_name
+        description: Full name of the employee.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: job_title
+        description: Employee's Job Title based on his current Roles and Responsibilities.      
+        tests:
+          - not_null
+          - string_not_empty
+
+  - name: stg_stores
+    description: Staged stores data from order management system (OMS).  
+    columns:
+      - name: store_id
+        description: The primary key.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: store_key
+        description: Surrogate key for store.      
+        tests:
+          - unique
+          - not_null
+      - name: store_name
+        description: Name of the store.      
+        tests:
+          - not_null
+          - string_not_empty
+
+  - name: stg_suppliers
+    description: Staged suppliers data from order management system (OMS).  
+    columns:
+      - name: supplier_id
+        description: The primary key.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: supplier_key
+        description: Surrogate key for supplier.      
+        tests:
+          - unique
+          - not_null
+      - name: supplier_name
+        description: Name of the supplier.      
+        tests:
+          - not_null
+          - string_not_empty
+
+  - name: stg_products
+    description: Staged products data from order management system (OMS).  
+    columns:
+      - name: product_id
+        description: The primary key.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: product_key
+        description: Surrogate key for product.      
+        tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: Name of the product.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: category
+        description: Category of the product.      
+        tests:
+          - not_null
+          - string_not_empty
+      - name: retail_price
+        description: Retail price of the product.      
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: supplier_price
+        description: Supplier price of the product.    
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: supplier_id
+        description: Foreign key to the suppliers table.      
+        tests:
+          - not_null
+          - string_not_empty
+          - relationships:
+              arguments:
+                to: ref('stg_suppliers')
+                field: supplier_id
+
+
+  - name: stg_orders
+    description: Staged orders data from order management system (OMS).  
+    columns:
+      - name: order_id
+        description: The primary key.      
+        tests:
+          - unique
+          - not_null
+          - string_not_empty
+      - name: customer_id
+        description: Foreign key to the customers table.      
+        tests:
+          - not_null
+          - string_not_empty
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: store_id
+        description: Foreign key to the stores table.      
+        tests:
+          - not_null
+          - string_not_empty
+          - relationships:
+              arguments:
+                to: ref('stg_stores')
+                field: store_id
+      - name: status_cd
+        description: Order status code  
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['01', '02', '03']
+
+  - name: stg_orderitems
+    description: Staged order items data from order management system (OMS).   
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - order_item_id
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - string_not_empty
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - string_not_empty
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id

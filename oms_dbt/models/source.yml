@@ -1,0 +1,31 @@
+sources:
+  - name: oms
+    description: The primary source system for order management system(OMS) data analytics.  
+    database: OMS
+    schema: LOADED
+
+    tables:
+      - name: customers
+        description: The customers table from order management system(OMS).      
+        identifier: CUSTOMERS
+      - name: orders
+        description: The orders table from order management system(OMS).      
+        identifier: ORDERS
+      - name: orderitems
+        description: The orderitems table from order management system(OMS).      
+        identifier: ORDERITEMS
+      - name: employees
+        description: The employees table from order management system(OMS).      
+        identifier: EMPLOYEES
+      - name: products
+        description: The products table from order management system(OMS).      
+        identifier: PRODUCTS
+      - name: suppliers
+        description: The suppliers table from order management system(OMS).      
+        identifier: SUPPLIERS
+      - name: stores
+        description: The stores table from order management system(OMS).      
+        identifier: STORES 
+      - name: dates
+        description: The dates table from order management system(OMS).      
+        identifier: DATES

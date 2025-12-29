@@ -1,0 +1,103 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Dimension table for customers"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests:
+          - not_null
+          - string_not_empty
+      - name: customer_key
+        description: "Surrogate key for customers"
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: "Full name of the customer"
+        tests:
+          - not_null
+          - string_not_empty
+
+  - name: dim_employees
+    description: "Dimension table for employees"
+    columns:
+      - name: employee_id
+        description: "Primary key"
+        tests:
+          - not_null
+          - string_not_empty
+      - name: employee_key  
+        description: "Surrogate key for employees"
+        tests:
+          - unique
+          - not_null
+      - name: employee_name
+        description: "Full name of the employee"
+        tests:
+          - not_null
+          - string_not_empty
+      - name: job_title
+        description: Employee's Job Title based on his current Roles and Responsibilities.      
+        tests:
+          - not_null
+          - string_not_empty
+
+  - name: fct_orders
+    description: "Fact table for orders"
+    columns:
+      - name: order_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+          - string_not_empty
+      - name: customer_id
+        tests:
+          - not_null
+          - string_not_empty
+      - name: employee_id
+        tests:
+          - not_null
+          - string_not_empty
+      - name: store_id
+        tests:
+          - not_null
+          - string_not_empty
+      - name: revenue
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: obt_orders
+    description: "One Big Table for orders, denormalized for reporting"
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('fct_orders')
+    columns:
+      - name: order_id
+        description: "Primary key. Must remain unique after joins."
+        tests:
+          - unique
+          - not_null
+          - string_not_empty
+      - name: customer_name
+        description: "Full name of the customer"
+        tests:
+          - not_null
+          - string_not_empty
+      - name: employee_name
+        description: "Full name of the employee"
+        tests:
+          - not_null
+          - string_not_empty
+      - name: store_name
+        description: "Name of the store"
+        tests:
+          - not_null
+          - string_not_empty
+    
+  - name: store_performance
+    description: "Aggregated store performance metrics"
